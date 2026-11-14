@@ -24,13 +24,13 @@ jobs:
         shell: pwsh
         run: |
           $tag = git tag --points-at HEAD
-          if ($tag) { $suffix = $tag } else { $suffix = "sha[$(git rev-parse --short HEAD)]" }
+          if ($tag) { $suffix = $tag } else { $suffix = "sha-$(git rev-parse --short HEAD)" }
           $name = "PrimeHack-G2MJ-win-x64-$suffix"
           Copy-Item -Recurse Binary\x64 $name
           # keep settings next to the exe instead of the user's Documents folder
           New-Item -ItemType File "$name\portable.txt" | Out-Null
-          Copy-Item COPYING $name
-          Copy-Item -Recurse LICENSES $name
+          if (-not (Test-Path -LiteralPath "$name\COPYING")) { Copy-Item COPYING $name }
+          if (-not (Test-Path -LiteralPath "$name\LICENSES")) { Copy-Item -Recurse LICENSES $name }
           Get-ChildItem $name -Recurse -Include *.pdb,*.exp,*.lib,*.ilk | Remove-Item
           Compress-Archive -Path $name -DestinationPath "$name.zip"
           "name=$name" >> $env:GITHUB_OUTPUT
