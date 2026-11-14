@@ -139,6 +139,19 @@ jobs:
         run: |
           lipo -create build/Binaries/DolphinQt.app/Contents/MacOS/DolphinQt build-arm/Binaries/DolphinQt.app/Contents/MacOS/DolphinQt -o dolphin
           mv dolphin build/Binaries/DolphinQt.app/Contents/MacOS/DolphinQt
+          # Bundle the Qt dylibs/plugins built into ~/deps so the app runs on other Macs
+          APP=build/Binaries/DolphinQt.app
+          mkdir -p "$APP/Contents/Frameworks" "$APP/Contents/MacOS/imageformats" "$APP/Contents/MacOS/iconengines"
+          for l in Core Gui Widgets Svg; do cp -L "$HOME/deps/lib/libQt6$l.6.dylib" "$APP/Contents/Frameworks/"; done
+          cp -L "$HOME/deps/plugins/imageformats/libqsvg.dylib" "$APP/Contents/MacOS/imageformats/"
+          if [ -f "$HOME/deps/plugins/iconengines/libqsvgicon.dylib" ]; then cp -L "$HOME/deps/plugins/iconengines/libqsvgicon.dylib" "$APP/Contents/MacOS/iconengines/"; fi
+          install_name_tool -add_rpath "@executable_path/../Frameworks" "$APP/Contents/MacOS/DolphinQt"
+          # fail if anything still points at the build machine or Homebrew
+          if find "$APP" -type f \( -name '*.dylib' -o -perm -u+x \) -exec otool -L {} + 2>/dev/null | grep -E '/Users/runner|/opt/homebrew|/usr/local/(opt|Cellar)'; then
+            echo "::error::non-bundled dylib dependency left in the app"; exit 1
+          fi
+          codesign --force --deep --sign - "$APP"
+          codesign --verify --deep "$APP"
           TAG="$(git tag --points-at HEAD)"
           if [ ! -z "$TAG" ]; then
             SUFFIX="$TAG"
