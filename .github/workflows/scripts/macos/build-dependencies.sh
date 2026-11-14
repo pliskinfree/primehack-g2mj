@@ -2,12 +2,12 @@
 
 set -e
 
-export MACOSX_DEPLOYMENT_TARGET=10.15
+export MACOSX_DEPLOYMENT_TARGET=11.0
 INSTALLDIR="$HOME/deps"
 NPROCS="$(getconf _NPROCESSORS_ONLN)"
 SDL=SDL2-2.30.9
-QT=6.2.10
-QT_SUFFIX=-opensource
+QT=6.5.1   # same Qt as the bundled Windows build (Externals/Qt); PrimeHack 1.0.9 needs Qt >= 6.3
+QT_SUFFIX=
 
 mkdir deps-build
 cd deps-build
@@ -19,10 +19,10 @@ export CXXFLAGS="-I$INSTALLDIR/include -Os $CXXFLAGS"
 
 cat > SHASUMS <<EOF
 24b574f71c87a763f50704bbb630cbe38298d544a1f890f099a4696b1d6beba4  $SDL.tar.gz
-efbeff5ad6f4d46e82734a681909892401688432fd7ef02c63d2083304d8265c  qtbase-everywhere$QT_SUFFIX-src-$QT.tar.xz
-5e04e4b7699d837c52641310ca386373801a24e8924de7ffcc4b84890431eb38  qtsvg-everywhere$QT_SUFFIX-src-$QT.tar.xz
-62809b242ebcb0e65ac6738f76d005d24c352a8b813128fa3772906ca50cf980  qttools-everywhere$QT_SUFFIX-src-$QT.tar.xz
-57e7cb80d31c32ccbb00bbd7da170970b9effb992970aaf687d4524117aca41e  qttranslations-everywhere$QT_SUFFIX-src-$QT.tar.xz
+db56fa1f4303a1189fe33418d25d1924931c7aef237f89eea9de58e858eebfed  qtbase-everywhere$QT_SUFFIX-src-$QT.tar.xz
+d58d29491d44f0f59b684686a9898fec0e6c4fb7c09d9393b4e9c211fe9608ef  qtsvg-everywhere$QT_SUFFIX-src-$QT.tar.xz
+5744df9e84b2a86f7f932ffc00341c7d7209e741fd1c0679a32b855fcceb2329  qttools-everywhere$QT_SUFFIX-src-$QT.tar.xz
+527e2c34c2637ece49c0e1fb65b0c5e5dce0f9b3f3710381468fe4e36080d49b  qttranslations-everywhere$QT_SUFFIX-src-$QT.tar.xz
 EOF
 
 curl -L \
