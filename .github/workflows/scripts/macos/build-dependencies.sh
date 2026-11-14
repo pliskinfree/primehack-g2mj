@@ -2,11 +2,11 @@
 
 set -e
 
-export MACOSX_DEPLOYMENT_TARGET=11.0
+export MACOSX_DEPLOYMENT_TARGET=12.0
 INSTALLDIR="$HOME/deps"
 NPROCS="$(getconf _NPROCESSORS_ONLN)"
 SDL=SDL2-2.30.9
-QT=6.5.1   # same Qt as the bundled Windows build (Externals/Qt); PrimeHack 1.0.9 needs Qt >= 6.3
+QT=6.8.3   # PrimeHack 1.0.9 needs Qt >= 6.3; 6.5.x does not build with the Xcode 16 libc++ on macos-15
 QT_SUFFIX=
 
 mkdir deps-build
@@ -19,10 +19,10 @@ export CXXFLAGS="-I$INSTALLDIR/include -Os $CXXFLAGS"
 
 cat > SHASUMS <<EOF
 24b574f71c87a763f50704bbb630cbe38298d544a1f890f099a4696b1d6beba4  $SDL.tar.gz
-db56fa1f4303a1189fe33418d25d1924931c7aef237f89eea9de58e858eebfed  qtbase-everywhere$QT_SUFFIX-src-$QT.tar.xz
-d58d29491d44f0f59b684686a9898fec0e6c4fb7c09d9393b4e9c211fe9608ef  qtsvg-everywhere$QT_SUFFIX-src-$QT.tar.xz
-5744df9e84b2a86f7f932ffc00341c7d7209e741fd1c0679a32b855fcceb2329  qttools-everywhere$QT_SUFFIX-src-$QT.tar.xz
-527e2c34c2637ece49c0e1fb65b0c5e5dce0f9b3f3710381468fe4e36080d49b  qttranslations-everywhere$QT_SUFFIX-src-$QT.tar.xz
+56001b905601bb9023d399f3ba780d7fa940f3e4861e496a7c490331f49e0b80  qtbase-everywhere$QT_SUFFIX-src-$QT.tar.xz
+35eb516460f00f264eb504baa253432384351cf23fb9980a5857190e8deef438  qtsvg-everywhere$QT_SUFFIX-src-$QT.tar.xz
+02a4e219248b94f1333df843d25763f35251c1074cdc4fb5bda67d340f8c8b3a  qttools-everywhere$QT_SUFFIX-src-$QT.tar.xz
+c3c61d79c3d8fe316a20b3617c64673ce5b5519b2e45535f49bee313152fa531  qttranslations-everywhere$QT_SUFFIX-src-$QT.tar.xz
 EOF
 
 curl -L \
@@ -63,20 +63,7 @@ cd ..
 echo "Installing Qt Tools..."
 tar xf "qttools-everywhere$QT_SUFFIX-src-$QT.tar.xz"
 cd "qttools-everywhere-src-$QT"
-# Linguist relies on a library in the Designer target, which takes 5-7 minutes to build on the CI
-# Avoid it by not building Linguist, since we only need the tools that come with it
-patch -u src/linguist/CMakeLists.txt <<EOF
---- src/linguist/CMakeLists.txt
-+++ src/linguist/CMakeLists.txt
-@@ -14,7 +14,7 @@
- add_subdirectory(lrelease-pro)
- add_subdirectory(lupdate)
- add_subdirectory(lupdate-pro)
--if(QT_FEATURE_process AND QT_FEATURE_pushbutton AND QT_FEATURE_toolbutton AND TARGET Qt::Widgets AND NOT no-png)
-+if(QT_FEATURE_process AND QT_FEATURE_pushbutton AND QT_FEATURE_toolbutton AND TARGET Qt::Widgets AND TARGET Qt::PrintSupport AND NOT no-png)
-     add_subdirectory(linguist)
- endif()
-EOF
+# Qt 6.8 already skips Linguist (needs PrintSupport, which is disabled), so no patch is needed
 cmake -B build -DCMAKE_PREFIX_PATH="$INSTALLDIR" -DCMAKE_INSTALL_PREFIX="$INSTALLDIR" -DCMAKE_BUILD_TYPE=Release -DFEATURE_assistant=OFF -DFEATURE_clang=OFF -DFEATURE_designer=OFF -DFEATURE_kmap2qmap=OFF -DFEATURE_pixeltool=OFF -DFEATURE_pkg_config=OFF -DFEATURE_qev=OFF -DFEATURE_qtattributionsscanner=OFF -DFEATURE_qtdiag=OFF -DFEATURE_qtplugininfo=OFF
 make -C build "-j$NPROCS"
 make -C build install
