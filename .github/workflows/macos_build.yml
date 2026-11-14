@@ -150,6 +150,11 @@ jobs:
           if find "$APP" -type f \( -name '*.dylib' -o -perm -u+x \) -exec otool -L {} + 2>/dev/null | grep -E '/Users/runner|/opt/homebrew|/usr/local/(opt|Cellar)'; then
             echo "::error::non-bundled dylib dependency left in the app"; exit 1
           fi
+          # every bundled Mach-O must contain both architectures
+          for f in "$APP/Contents/MacOS/DolphinQt" "$APP"/Contents/Frameworks/libQt6*.dylib "$APP"/Contents/MacOS/*/*.dylib; do
+            archs="$(lipo -archs "$f")"
+            case "$archs" in *x86_64*arm64*|*arm64*x86_64*) ;; *) echo "::error::$f is not universal ($archs)"; exit 1;; esac
+          done
           codesign --force --deep --sign - "$APP"
           codesign --verify --deep "$APP"
           TAG="$(git tag --points-at HEAD)"

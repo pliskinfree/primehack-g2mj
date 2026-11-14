@@ -191,16 +191,25 @@ void Nunchuk::ChangeUIPrimeHack(bool useMetroidUI)
 void Nunchuk::LoadDefaults()
 {
   // Movement
+#ifdef __APPLE__
+  m_stick->SetControlExpression(0, "W | `Up Arrow`");     // Push
+  m_stick->SetControlExpression(1, "S | `Down Arrow`");   // Pull
+  m_stick->SetControlExpression(2, "A | `Left Arrow`");   // Tilt left
+  m_stick->SetControlExpression(3, "D | `Right Arrow`");  // Tilt right
+#else
   m_stick->SetControlExpression(0, "W | UP");     // Push
   m_stick->SetControlExpression(1, "S | DOWN");   // Pull
   m_stick->SetControlExpression(2, "A | LEFT");   // Tilt left
   m_stick->SetControlExpression(3, "D | RIGHT");  // Tilt right
+#endif
 
   // Because our defaults use keyboard input, set calibration shape to a square.
   m_stick->SetCalibrationFromGate(ControllerEmu::SquareStickGate(1.0));
 
 #ifdef _WIN32
   m_buttons->SetControlExpression(1, "`Click 1`"); // Lock-On
+#elif defined(__APPLE__)
+  m_buttons->SetControlExpression(1, "`Right Click`"); // Lock-On
 #else
   m_buttons->SetControlExpression(1, "`Click 3`"); // Lock-On
 #endif
@@ -208,6 +217,11 @@ void Nunchuk::LoadDefaults()
   m_buttons->SetControlExpression(0, "Ctrl"); // Morph
 
   // Shake (Only used in Prime 3, may need revision
+#ifdef __APPLE__
+  // Quartz has no relative mouse axes; use the cursor axes instead
+  m_shake->SetControlExpression(1, "Shift & (`Cursor Y-` | `Cursor Y+` | `Cursor X-` | `Cursor X+`)");
+#else
   m_shake->SetControlExpression(1, "LSHIFT & (`Axis Y-` | `Axis Y+` | `Axis X-` | `Axis X+`)");
+#endif
 }
 }  // namespace WiimoteEmu

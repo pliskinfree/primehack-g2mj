@@ -344,7 +344,11 @@ void GCPad::LoadPrimeHackDefaults(const ControllerInterface& ciface)
   m_buttons->SetControlExpression(2, "Ctrl"); // X
 
   // Middle click is Click 2 on Fedora/Wayland and Windows 10
+#ifdef __APPLE__
+  m_buttons->SetControlExpression(3, "F | `Middle Click`");  // Y
+#else
   m_buttons->SetControlExpression(3, "F | `Click 2`");  // Y
+#endif
 
   // D-Pad
   m_dpad->SetControlExpression(0, "E & `1`");  // Up

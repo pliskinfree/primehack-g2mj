@@ -933,6 +933,12 @@ void Wiimote::LoadPrimeHackDefaults(const ControllerInterface& ciface)
   m_buttons->SetControlExpression(1, "SPACE"); // Jump
   m_buttons->SetControlExpression(2, "TAB"); // Map
   m_buttons->SetControlExpression(3, "GRAVE"); // Pause Menu
+#elif defined(__APPLE__)
+  // Quartz key/button names (the X11 names below do not exist on macOS)
+  m_buttons->SetControlExpression(0, "`Left Click` | Return"); // Fire/Accept/Bomb
+  m_buttons->SetControlExpression(1, "Space"); // Jump
+  m_buttons->SetControlExpression(2, "Tab"); // Map
+  m_buttons->SetControlExpression(3, "Tilde | P"); // Pause Menu
 #else
   m_buttons->SetControlExpression(0, "`Click 1` | RETURN"); // Fire
   m_buttons->SetControlExpression(1, "space"); // Jump
@@ -947,10 +953,15 @@ void Wiimote::LoadPrimeHackDefaults(const ControllerInterface& ciface)
   // DPad
   // Missiles
   // Middle click is Click 2 on Fedora/Wayland and Windows 10
+#ifdef __APPLE__
+  const char* missile = "F | `Middle Click`";
+#else
+  const char* missile = "F | `Click 2`";
+#endif
   if (using_metroid_ui)
-    m_buttons->SetControlExpression(6, "F | `Click 2`");
+    m_buttons->SetControlExpression(6, missile);
   else
-    m_dpad->SetControlExpression(1, "F | `Click 2`");
+    m_dpad->SetControlExpression(1, missile);
 
   // Motion Source
   m_imu_accelerometer->SetControlExpression(0, "`Android/0/Device Sensors:Accel Up`");

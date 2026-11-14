@@ -55,7 +55,7 @@ cd ..
 echo "Installing Qt SVG..."
 tar xf "qtsvg-everywhere$QT_SUFFIX-src-$QT.tar.xz"
 cd "qtsvg-everywhere-src-$QT"
-cmake -B build -DCMAKE_PREFIX_PATH="$INSTALLDIR" -DCMAKE_INSTALL_PREFIX="$INSTALLDIR" -DCMAKE_BUILD_TYPE=Release
+cmake -B build -DCMAKE_OSX_ARCHITECTURES="x86_64;arm64" -DCMAKE_PREFIX_PATH="$INSTALLDIR" -DCMAKE_INSTALL_PREFIX="$INSTALLDIR" -DCMAKE_BUILD_TYPE=Release
 make -C build "-j$NPROCS"
 make -C build install
 cd ..
