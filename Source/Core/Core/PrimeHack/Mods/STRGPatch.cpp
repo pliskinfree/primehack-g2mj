@@ -9,6 +9,7 @@
 #include "Core/System.h"
 
 constexpr u32 STR_TABLE_SIZE = 0x1000;
+const std::string CN_PREFIX = "\x01cn:";
 
 namespace prime {
 namespace {
@@ -48,7 +49,20 @@ void STRGPatch::patch_strg_entry_vmc_common(PowerPC::PowerPCState& ppc_state, Po
     if (found_key == key) {
       u32 strg_val_index = mmu.Read<u32>(bsearch_result + 4);
       u32 strg_val_table = mmu.Read<u32>(strg_header + 0x1c);
-      mmu.Write<u32>(replacement->second.first + guest_table_addr, strg_val_table + 4 * strg_val_index);
+      // Chinese fan translation (text written into the ENGL table): if the game's own string
+      // contains CJK (UTF-8 lead byte 0xE3-0xE9), use the Chinese replacement when one exists.
+      u32 slot = replacement->second.first;
+      auto cn = replace_tbl.find(CN_PREFIX + key);
+      if (cn != replace_tbl.end()) {
+        std::string orig = readin_str(mmu, mmu.Read<u32>(strg_val_table + 4 * strg_val_index));
+        for (unsigned char c : orig) {
+          if (c >= 0xE3 && c <= 0xE9) {
+            slot = cn->second.first;
+            break;
+          }
+        }
+      }
+      mmu.Write<u32>(slot + guest_table_addr, strg_val_table + 4 * strg_val_index);
     }
   }
 }
@@ -82,6 +96,13 @@ bool STRGPatch::init_mod(Game game, Region region) {
       guest_table_addr = GuestAlloc(STR_TABLE_SIZE);
 
       add_table_entry("NunchukRequired", GetMotd());
+      add_table_entry(CN_PREFIX + "NunchukRequired", "\xE6\x84\x9F\xE8\xB0\xA2\xE4\xBD\xBF\xE7\x94\xA8 PrimeHack\xEF\xBC\x81\n\xE5\xA6\x82\xE9\x9C\x80\xE5\xB8\xAE\xE5\x8A\xA9\xEF\xBC\x8C\xE8\xAF\xB7\xE6\x9F\xA5\xE9\x98\x85 PrimeHack \xE7\x9A\x84 wiki\xE3\x80\x82" /* 感谢使用 PrimeHack！\n如需帮助，请查阅 PrimeHack 的 wiki。 */);
+      add_table_entry(CN_PREFIX + "DifficultyMenu_Easiest",
+        "&link=[starteasiest]?typewrite=reverse;&wholepane;&rollover=menu2_hl;[ \xE6\x99\xAE\xE9\x80\x9A\xEF\xBC\x88\xE7\xAE\x80\xE5\x8D\x95\xEF\xBC\x89 ]&endlink;" /* &link=[starteasiest]?typewrite=reverse;&wholepane;&rollover=menu2_hl;[ 普通（简单） ]&endlink; */);
+      add_table_entry(CN_PREFIX + "DifficultyMenu_Medium",
+        "&link=[startmedium]?typewrite=reverse;&wholepane;&rollover=menu3_hl;[ \xE8\x80\x81\xE6\x89\x8B\xEF\xBC\x88\xE6\x99\xAE\xE9\x80\x9A\xEF\xBC\x89 ]&endlink;" /* &link=[startmedium]?typewrite=reverse;&wholepane;&rollover=menu3_hl;[ 老手（普通） ]&endlink; */);
+      add_table_entry(CN_PREFIX + "DifficultyMenu_Hardest",
+        "&if=HypermodeUnlocked;&link=[starthardest]?typewrite=reverse;&wholepane;&rollover=menu4_hl;[ \xE8\xB6\x85\xE8\x83\xBD\xEF\xBC\x88\xE5\x9B\xB0\xE9\x9A\xBE\xEF\xBC\x89 ]&endlink;&endif;" /* &if=HypermodeUnlocked;&link=[starthardest]?typewrite=reverse;&wholepane;&rollover=menu4_hl;[ 超能（困难） ]&endlink;&endif; */);
       add_table_entry("DifficultyMenu_Easiest",
         "&link=[starteasiest]?typewrite=reverse;&wholepane;&rollover=menu2_hl;[ Normal (Easy) ]&endlink;");
       add_table_entry("DifficultyMenu_Medium",
@@ -107,6 +128,9 @@ bool STRGPatch::init_mod(Game game, Region region) {
       guest_table_addr = GuestAlloc(STR_TABLE_SIZE);
 
       add_table_entry("NunchukRequired", GetMotd());
+      add_table_entry(CN_PREFIX + "NunchukRequired", "\xE6\x84\x9F\xE8\xB0\xA2\xE4\xBD\xBF\xE7\x94\xA8 PrimeHack\xEF\xBC\x81\n\xE5\xA6\x82\xE9\x9C\x80\xE5\xB8\xAE\xE5\x8A\xA9\xEF\xBC\x8C\xE8\xAF\xB7\xE6\x9F\xA5\xE9\x98\x85 PrimeHack \xE7\x9A\x84 wiki\xE3\x80\x82" /* 感谢使用 PrimeHack！\n如需帮助，请查阅 PrimeHack 的 wiki。 */);
+      add_table_entry(CN_PREFIX + "ShakeOffGandrayda",
+                      "&just=center;\xE6\x8C\x89\xE4\xBD\x8F\xE8\xB7\xB3\xE8\xB7\x83\xE9\x94\xAE [&image=0x5FC17B1F30BAA7AE;] \xE6\x8C\xA3\xE8\x84\xB1\xE7\x94\x98\xE5\xBE\xB7\xE8\x95\xBE\xE8\xBE\xBE\xEF\xBC\x81" /* &just=center;按住跳跃键 [&image=0x5FC17B1F30BAA7AE;] 挣脱甘德蕾达！ */);
       add_table_entry("ShakeOffGandrayda",
                       "&just=center;Hold Jump [&image=0x5FC17B1F30BAA7AE;] to shake off Gandrayda!");
       int vmc_id = Core::System::GetInstance().GetPowerPC().RegisterVmcall(patch_strg_entry_mp3_and_menu);
@@ -120,6 +144,8 @@ bool STRGPatch::init_mod(Game game, Region region) {
     case Game::PRIME_3: {
       guest_table_addr = GuestAlloc(STR_TABLE_SIZE);
 
+      add_table_entry(CN_PREFIX + "ShakeOffGandrayda",
+                      "&just=center;\xE6\x8C\x89\xE4\xBD\x8F\xE8\xB7\xB3\xE8\xB7\x83\xE9\x94\xAE [&image=0x5FC17B1F30BAA7AE;] \xE6\x8C\xA3\xE8\x84\xB1\xE7\x94\x98\xE5\xBE\xB7\xE8\x95\xBE\xE8\xBE\xBE\xEF\xBC\x81" /* &just=center;按住跳跃键 [&image=0x5FC17B1F30BAA7AE;] 挣脱甘德蕾达！ */);
       add_table_entry("ShakeOffGandrayda",
                       "&just=center;Hold Jump [&image=0x5FC17B1F30BAA7AE;] to shake off Gandrayda!");
       int vmc_id = Core::System::GetInstance().GetPowerPC().RegisterVmcall(patch_strg_entry_mp3_and_menu);
