@@ -347,6 +347,9 @@ void ElfModLoader::init_cleanup(Game game, Region region) {
       } else if (region == Region::PAL) {
         bl_hook_addr = 0x80006374;
         add_code_change(0x8000637c, 0x48000014);
+      } else if (region == Region::NTSC_J) {
+        bl_hook_addr = 0x800063e0;
+        add_code_change(0x800063e8, 0x48000014);
       }
       break;
 

@@ -1,0 +1,42 @@
+name: Windows Build Steps
+
+on: [push, pull_request, workflow_dispatch]
+
+jobs:
+  build_windows:
+    name: Windows x64 Build
+    runs-on: windows-2022
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Set up MSBuild
+        uses: microsoft/setup-msbuild@v2
+
+      - name: Build PrimeHack (Release x64)
+        run: msbuild Source\dolphin-emu.sln /m /p:Configuration=Release /p:Platform=x64 /v:minimal
+
+      - name: Prepare Build Artifacts
+        id: create-artifact
+        shell: pwsh
+        run: |
+          $tag = git tag --points-at HEAD
+          if ($tag) { $suffix = $tag } else { $suffix = "sha[$(git rev-parse --short HEAD)]" }
+          $name = "PrimeHack-G2MJ-win-x64-$suffix"
+          Copy-Item -Recurse Binary\x64 $name
+          # keep settings next to the exe instead of the user's Documents folder
+          New-Item -ItemType File "$name\portable.txt" | Out-Null
+          Copy-Item COPYING $name
+          Copy-Item -Recurse LICENSES $name
+          Get-ChildItem $name -Recurse -Include *.pdb,*.exp,*.lib,*.ilk | Remove-Item
+          Compress-Archive -Path $name -DestinationPath "$name.zip"
+          "name=$name" >> $env:GITHUB_OUTPUT
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.create-artifact.outputs.name }}
+          path: "*.zip"

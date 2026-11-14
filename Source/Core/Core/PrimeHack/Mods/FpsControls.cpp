@@ -1212,6 +1212,31 @@ void FpsControls::init_mod_mp2_gc(Region region) {
     const int null_players_vmc_idx = Core::System::GetInstance().GetPowerPC().RegisterVmcall(null_players_on_destruct_mp2_gc);
     u32 null_players_vmc = gen_vmcall(null_players_vmc_idx, 0);
     add_code_change(0x80042b04, null_players_vmc);
+  } else if (region == Region::NTSC_J) {
+    add_code_change(0x800bdacc, 0x38810044); // output cannon bob only for viewbob
+
+    add_code_change(0x801b0d10, 0x60000000);
+    add_code_change(0x80013414, 0x4e800020);
+    add_code_change(0x801b0f18, 0x60000000);
+    add_code_change(0x801b2000, 0x48000078);
+    add_code_change(0x801b1208, 0x48000a34);
+    // Enable strafing with left/right on L-Stick
+    add_code_change(0x80189f70, 0xc022a5c8);
+    add_code_change(0x80189c08, 0x4800000c);
+    // Grapple point yaw fix
+    add_code_change(0x8011e918, 0x389d0054);
+    add_code_change(0x8011e91c, 0x4bf2cd91);  // bl 8004b6ac
+
+    add_code_change(0x8001695c, 0x3aa00001, "show_crosshair"); // li r21, 1
+    add_code_change(0x80016960, 0x8add1268, "show_crosshair"); // lbz r22, 0x1268(r29)
+    add_code_change(0x80016964, 0x52b63672, "show_crosshair"); // rlwimi r22, r21, 6, 25, 25 (00000001)
+    add_code_change(0x80016968, 0x9add1268, "show_crosshair"); // stb r22, 0x1268(r29)
+    add_code_change(0x8001696c, 0x4e800020, "show_crosshair"); // blr
+
+    add_code_change(0x80061fc0, 0xc022d430);  // lfs f1, 1.75
+    const int null_players_vmc_idx = Core::System::GetInstance().GetPowerPC().RegisterVmcall(null_players_on_destruct_mp2_gc);
+    u32 null_players_vmc = gen_vmcall(null_players_vmc_idx, 0);
+    add_code_change(0x80043470, null_players_vmc);
   } else {}
 }
 

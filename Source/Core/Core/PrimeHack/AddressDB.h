@@ -20,6 +20,8 @@ public:
 
   AddressDB();
   void register_address(Game game, std::string_view name, u32 addr_ntsc_u = 0, u32 addr_pal = 0);
+  // NTSC-J (G2MJ01) value; names without one fall back to the NTSC-U value (structure offsets)
+  void register_address_ntsc_j(Game game, std::string_view name, u32 addr_ntsc_j);
   // Address is computed as:
   //   [...[[source_var + offset0] + offset1] + ... + offsetN-2] + offsetN-1
   // singleton lists will only offset source_var, not dereference
@@ -43,6 +45,7 @@ private:
   using game_map = std::map<Game, var_map>;
 
   std::map<Game, var_map> addr_mapping;
+  std::map<Game, std::map<std::string, u32, std::less<>>> addr_mapping_ntsc_j;
   std::map<Game, dyn_var_map> dyn_addr_mapping;
 };
 

@@ -181,6 +181,8 @@ bool DisableHudMemoPopup::init_mod(Game game, Region region) {
         add_code_change(0x800bb10c, 0x48000018);
       } else if (region == Region::PAL) {
         add_code_change(0x800bb1a0, 0x48000018);
+      } else if (region == Region::NTSC_J) {
+        add_code_change(0x800bbe9c, 0x48000018);
       }
       break;
     case Game::PRIME_3:

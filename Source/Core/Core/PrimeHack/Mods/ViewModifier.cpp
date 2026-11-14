@@ -187,6 +187,7 @@ void ViewModifier::run_mod_mp2() {
 
 void ViewModifier::run_mod_mp2_gc() {
   constexpr u32 kMenuWorldID = 0x69802220;
+  constexpr u32 kMenuWorldIDNtscJ = 0xbfeb893f;  // G2MJ01 FrontEnd MLVL
   LOOKUP(tweakgun_offset);
 
   LOOKUP_DYN(world);
@@ -199,7 +200,7 @@ void ViewModifier::run_mod_mp2_gc() {
   }
 
   LOOKUP_DYN(world_id);
-  if (read32(world_id) == kMenuWorldID) {
+  if (read32(world_id) == kMenuWorldID || read32(world_id) == kMenuWorldIDNtscJ) {
     set_code_group_state("disable_fov_updates", ModState::DISABLED);
     return;
   }
@@ -389,6 +390,12 @@ void ViewModifier::init_mod_mp2_gc(Region region) {
     add_code_change(0x801b0e08, 0x60000000, "disable_fov_updates");
     add_code_change(0x802f8818, 0x38600001, "culling");
     add_code_change(0x802f8818 + 0x4, 0x4e800020, "culling");
+  } else if (region == Region::NTSC_J) {
+    add_code_change(0x801b28f0, 0x60000000, "disable_fov_updates");
+    add_code_change(0x801b37a4, 0x60000000, "disable_fov_updates");
+    add_code_change(0x801b28b4, 0x60000000, "disable_fov_updates");
+    add_code_change(0x802fa6d0, 0x38600001, "culling");
+    add_code_change(0x802fa6d0 + 0x4, 0x4e800020, "culling");
   }
 }
 

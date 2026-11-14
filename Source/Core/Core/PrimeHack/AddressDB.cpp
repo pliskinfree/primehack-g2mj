@@ -40,6 +40,10 @@ void AddressDB::register_address(Game game, std::string_view name, u32 addr_ntsc
   }
 }
 
+void AddressDB::register_address_ntsc_j(Game game, std::string_view name, u32 addr_ntsc_j) {
+  addr_mapping_ntsc_j[game][std::string(name)] = addr_ntsc_j;
+}
+
 void AddressDB::register_dynamic_address(Game game, std::string_view name, std::string_view source_var,
                                          std::vector<region_pair>&& offsets) {
   auto r1 = dyn_addr_mapping.find(game);
@@ -70,6 +74,16 @@ u32 AddressDB::lookup_address(Game game, Region region, std::string_view name) c
       return std::get<0>(r2->second);
     case Region::PAL:
       return std::get<1>(r2->second);
+    case Region::NTSC_J: {
+      auto j1 = addr_mapping_ntsc_j.find(game);
+      if (j1 != addr_mapping_ntsc_j.end()) {
+        auto j2 = j1->second.find(name);
+        if (j2 != j1->second.end()) {
+          return j2->second;
+        }
+      }
+      return std::get<0>(r2->second);
+    }
     default:
       return 0;
   }
@@ -112,6 +126,7 @@ u32 AddressDB::lookup_dynamic_address(Core::CPUThreadGuard const& guard, Game ga
     u32 offset;
     switch (region) {
       case Region::NTSC_U:
+      case Region::NTSC_J:
         offset = std::get<0>(*it);
         break;
       case Region::PAL:
@@ -129,6 +144,7 @@ u32 AddressDB::lookup_dynamic_address(Core::CPUThreadGuard const& guard, Game ga
   if (r2->second.offset_list.size() > 0) {
     switch (region) {
       case Region::NTSC_U:
+      case Region::NTSC_J:
         return result_addr + std::get<0>(*it);
         break;
       case Region::PAL:

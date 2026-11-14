@@ -290,10 +290,10 @@ void GCPad::LoadDefaults(const ControllerInterface& ciface)
   m_main_stick->SetControlExpression(2, "`LEFT`");   // Left
   m_main_stick->SetControlExpression(3, "`RIGHT`");  // Right
 #elif __APPLE__
-  m_main_stick->SetControlExpression(0, "`Up Arrow`");     // Up
-  m_main_stick->SetControlExpression(1, "`Down Arrow`");   // Down
-  m_main_stick->SetControlExpression(2, "`Left Arrow`");   // Left
-  m_main_stick->SetControlExpression(3, "`Right Arrow`");  // Right
+  m_main_stick->SetControlExpression(0, "W | `Up Arrow`");     // Up
+  m_main_stick->SetControlExpression(1, "S | `Down Arrow`");   // Down
+  m_main_stick->SetControlExpression(2, "A | `Left Arrow`");   // Left
+  m_main_stick->SetControlExpression(3, "D | `Right Arrow`");  // Right
 #else
   m_main_stick->SetControlExpression(0, "`Up`");     // Up
   m_main_stick->SetControlExpression(1, "`Down`");   // Down
@@ -326,6 +326,13 @@ void GCPad::LoadPrimeHackDefaults(const ControllerInterface& ciface)
   m_buttons->SetControlExpression(4, "TAB");  // Z
   m_buttons->SetControlExpression(5, "GRAVE");  // Start
   m_triggers->SetControlExpression(0, "`Click 1`"); // Lock-On
+#elif defined(__APPLE__)
+  // Quartz key/button names (the X11 names below do not exist on macOS)
+  m_buttons->SetControlExpression(0, "`Left Click` | Return"); // A
+  m_buttons->SetControlExpression(1, "Space");  // B
+  m_buttons->SetControlExpression(4, "Tab");  // Z
+  m_buttons->SetControlExpression(5, "Tilde | P");  // Start
+  m_triggers->SetControlExpression(0, "`Right Click` | Q"); // Lock-On
 #else
   m_buttons->SetControlExpression(0, "`Click 1` | RETURN"); // A
   m_buttons->SetControlExpression(1, "space");  // B
@@ -363,10 +370,10 @@ void GCPad::LoadPrimeHackDefaults(const ControllerInterface& ciface)
   m_main_stick->SetControlExpression(2, "A | LEFT");   // Left
   m_main_stick->SetControlExpression(3, "D | RIGHT");  // Right
 #elif __APPLE__
-  m_main_stick->SetControlExpression(0, "`Up Arrow`");     // Up
-  m_main_stick->SetControlExpression(1, "`Down Arrow`");   // Down
-  m_main_stick->SetControlExpression(2, "`Left Arrow`");   // Left
-  m_main_stick->SetControlExpression(3, "`Right Arrow`");  // Right
+  m_main_stick->SetControlExpression(0, "W | `Up Arrow`");     // Up
+  m_main_stick->SetControlExpression(1, "S | `Down Arrow`");   // Down
+  m_main_stick->SetControlExpression(2, "A | `Left Arrow`");   // Left
+  m_main_stick->SetControlExpression(3, "D | `Right Arrow`");  // Right
 #else
   m_main_stick->SetControlExpression(0, "W | Up");     // Up
   m_main_stick->SetControlExpression(1, "S | Down");   // Down

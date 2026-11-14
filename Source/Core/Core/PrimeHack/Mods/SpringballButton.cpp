@@ -297,6 +297,8 @@ bool SpringballButton::init_mod(Game game, Region region) {
         springball_code_gc(game, 0x800ce864, 18, 0x80085480, 0x80186838);
       } else if (region == Region::PAL) {
         springball_code_gc(game, 0x800ce93c, 18, 0x800855bc, 0x80186b1c);
+      } else if (region == Region::NTSC_J) {
+        springball_code_gc(game, 0x800cf638, 18, 0x80085ffc, 0x80188338);
       }
       break;
     case Game::PRIME_3:

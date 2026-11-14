@@ -234,6 +234,13 @@ void MapController::init_mod_mp2_gc(Region region) {
     add_code_change(0x8008d790, 0x3880002b);
     add_code_change(0x8008d7ac, 0x3880002e);
     add_code_change(0x8008d7c8, 0x3880002d);
+  } else if (region == Region::NTSC_J) {
+    add_code_change(0x80089af8, vmc_update_rotation);
+    add_code_change(0x8008f824, vmc_rotate_map);
+    add_code_change(0x8008e814, 0x3880002c);
+    add_code_change(0x8008e82c, 0x3880002b);
+    add_code_change(0x8008e848, 0x3880002e);
+    add_code_change(0x8008e864, 0x3880002d);
   }
 }
 

@@ -202,6 +202,12 @@ void init_db(AddressDB& addr_db) {
   addr_db.register_address(Game::PRIME_2_GCN, "xf_offset", 0x24, 0x24);
   addr_db.register_address(Game::PRIME_2_GCN, "vel_offset", 0x1a8, 0x1a8);
 
+  // G2MJ01 (NTSC-J), mapped from NTSC-U by instruction signatures
+  addr_db.register_address_ntsc_j(Game::PRIME_2_GCN, "state_manager", 0x803de690);
+  addr_db.register_address_ntsc_j(Game::PRIME_2_GCN, "tweak_player_offset", -0x6dfc);
+  addr_db.register_address_ntsc_j(Game::PRIME_2_GCN, "tweakgui_offset", -0x6de0);
+  addr_db.register_address_ntsc_j(Game::PRIME_2_GCN, "tweakgun_offset", -0x6ddc);
+
   addr_db.register_dynamic_address(Game::PRIME_2_GCN, "object_list", "state_manager", {mrp1(0x810), rp0});
   addr_db.register_dynamic_address(Game::PRIME_2_GCN, "player", "state_manager", {mrp1(0x14fc), rp0});
   addr_db.register_dynamic_address(Game::PRIME_2_GCN, "camera_manager", "state_manager", {mrp1(0x151c), mrp1(0x14)});

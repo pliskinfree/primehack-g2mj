@@ -136,6 +136,10 @@ void update_active_game_region(const Core::CPUThreadGuard& cpu_guard) {
           sActiveGame = Game::PRIME_2_GCN;
           sActiveRegion = Region::PAL;
           break;
+        case FOURCC('G', '2', 'M', 'J'):
+          sActiveGame = Game::PRIME_2_GCN;
+          sActiveRegion = Region::NTSC_J;
+          break;
         case FOURCC('R', 'M', '3', 'E'):
           sActiveGame = Game::PRIME_3_STANDALONE;
           sActiveRegion = Region::NTSC_U;

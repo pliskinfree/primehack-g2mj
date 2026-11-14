@@ -38,7 +38,8 @@ enum class Region : int {
   INVALID_REGION = -1,
   NTSC_U = 0,
   PAL = 1,
-  MAX_VAL = PAL,
+  NTSC_J = 2,  // G2MJ01 (Metroid Prime 2: Dark Echoes, GameCube, Japan) only
+  MAX_VAL = NTSC_J,
 };
 
 constexpr std::string_view game_str(Game g) {

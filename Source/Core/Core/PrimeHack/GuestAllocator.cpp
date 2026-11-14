@@ -81,6 +81,9 @@ void AllocSwitchGame(Game game, Region region) {
         avail_zones.emplace_back(0x80420000, 0xe000);
       } else if (region == Region::PAL) {
         avail_zones.emplace_back(0x80421000, 0xe000);
+      } else if (region == Region::NTSC_J) {
+        // G2MJ01: image end / stack top are NTSC-U + 0x30e0; same free zone, shifted
+        avail_zones.emplace_back(0x80423100, 0xdf00);
       }
       break;
 

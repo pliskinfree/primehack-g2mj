@@ -299,7 +299,8 @@ std::array<std::string_view, 14> kKnownTitles = {
   "R3MP", // MPT [PAL]
 };
 
-std::array<std::string_view, 8> kSupportedTitles = {
+std::array<std::string_view, 9> kSupportedTitles = {
+  "G2MJ", // MP2 Dark Echoes GCN [NTSC-J] (address port for the Chinese translation)
   "GM8E", // MP1 GCN [NTSC] (all revisions)
   "GM8P", // MP1 GCN [PAL]
   "G2ME", // MP2 GCN [NTSC]
